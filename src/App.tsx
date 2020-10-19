@@ -3,42 +3,27 @@ import './App.css';
 import * as THREE from "three";
 import * as mesh_representation from './test-mesh.json'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+
 import { Vector3 } from 'three';
+
+const colors = [ '#173F5F', '#20639B', '#3CAEA3', '#F6D55C', '#ED553B' ]
 
 function App() {
   let threeRef = useRef<HTMLDivElement>(document.createElement('div'))
   const mesh = mesh_representation["07Enbsqm9C7AQC9iyBwfSD"].mesh_representation
 
-  // const [ color, setColor ] = useState('#00ff00')
+  let color = '#173F5F'
 
-  let color = '#00ff00'
   useEffect(() => {
-    // === THREE.JS CODE START ===
-    // var scene = new THREE.Scene();
-    // var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-    // var renderer = new THREE.WebGLRenderer();
-    // renderer.setSize( window.innerWidth/3, window.innerHeight/3 );
-    // // use ref as a mount point of the Three.js scene instead of the document.body
-    // threeRef.current.appendChild( renderer.domElement );
-    // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    // var material = new THREE.MeshBasicMaterial( { color: color } );
-    // var cube = new THREE.Mesh( geometry, material );
-    // scene.add( cube );
-    // camera.position.z = 5;
-    // var animate = function () {
-    //   requestAnimationFrame( animate );
-    //   cube.rotation.x += 0.01;
-    //   cube.rotation.y += 0.01;
-    //   cube.material.color.set(color)
-    //   renderer.render( scene, camera ); 
-    // };
-    // animate();
-    // === THREE.JS EXAMPLE CODE END ===
-
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-    var renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth/3, window.innerHeight/3 );
+    camera.position.addScalar(25) 
+    
+    var renderer = new THREE.WebGLRenderer(); 
+    renderer.setSize( window.innerWidth/2, window.innerHeight/2 );
     // use ref as a mount point of the Three.js scene instead of the document.body
     threeRef.current.appendChild( renderer.domElement );
 
@@ -50,20 +35,12 @@ function App() {
       geometry.vertices.push(el)
     })
 
-    const vectorNormals = getNormals()
+    let controls = new OrbitControls( camera, threeRef.current );
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
 
-    // geometry.faces.push( new THREE.Face3( 3, 0, 1 ) );
-    // geometry.faces.push( new THREE.Face3( 3, 1, 2 ) );
-    // geometry.faces.push( new THREE.Face3( 6, 4, 5 ) );
-    // geometry.faces.push( new THREE.Face3( 7, 4, 6 ) );
-    // geometry.faces.push( new THREE.Face3( 11, 8, 9 ) );
-    // geometry.faces.push( new THREE.Face3( 11, 9, 10 ) );
-    // geometry.faces.push( new THREE.Face3( 15, 12, 13 ) );
-    // geometry.faces.push( new THREE.Face3( 15, 13, 14 ) );
-    // geometry.faces.push( new THREE.Face3( 17, 18, 19 ) );
-    // geometry.faces.push( new THREE.Face3( 17, 19, 16 ) );
-    // geometry.faces.push( new THREE.Face3( 23, 22, 21 ) );
-    // geometry.faces.push( new THREE.Face3( 20, 23, 21 ) );
+    const vectorNormals = getNormals()
 
     mesh.indices.forEach((el, i) => {
       // console.log(mesh.indices.length - i % 3)
@@ -91,10 +68,18 @@ function App() {
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     var cube = new THREE.Mesh( geometry, material );
 
-    var helper = new VertexNormalsHelper( cube, 2, 0xff0000 );
+    // var helper = new VertexNormalsHelper( cube, 2, 0xff0000 );
+
+    var size = 50;
+    var divisions = 10;
+
+    var gridHelper = new THREE.GridHelper( size, divisions );
+    scene.add( gridHelper );
 
     scene.add( cube );
-    scene.add( helper );
+    // scene.add( helper );
+
+    scene.background = new THREE.Color( 0xf0f2f5 );
 
     camera.position.z = 20;
     // camera.position.y = 7
@@ -107,6 +92,7 @@ function App() {
       // cube.rotation.z += 0.01; 
 
       cube.material.color.set(color)
+      controls.update();
       renderer.render( scene, camera ); 
     };
     animate();
@@ -158,7 +144,10 @@ function App() {
   const [ meshInfo, setMeshInfo ] = useState('')
 
   const onClickChangeColor = () => {
-    color = '#ffffff'
+    let randomColor = color
+    while (randomColor === color){
+      color = colors[Math.floor((Math.random() * 5))]
+    }
   }
 
   const getPointsFromPositions = () => {

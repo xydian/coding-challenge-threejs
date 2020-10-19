@@ -3,6 +3,7 @@ import './App.css';
 import * as THREE from "three";
 import * as mesh_representation from './test-mesh.json'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
+import { Vector3 } from 'three';
 
 function App() {
   let threeRef = useRef<HTMLDivElement>(document.createElement('div'))
@@ -43,15 +44,13 @@ function App() {
 
     var geometry = new THREE.Geometry();
 
-    const points = getPointsFromPositions()
-    points.forEach((el, i) => {
-      console.log("Adding vector on Points x: " + el[0] + " y: " + el[1] + " z: " + el[2])
-      geometry.vertices.push(
-        new THREE.Vector3( el[0],  el[1], el[2] ),
-      );
+    const vectorPoints = getPointsFromPositions()
+    vectorPoints.forEach((el, i) => {
+      // console.log("Adding vector on Points x: " + el[0] + " y: " + el[1] + " z: " + el[2])
+      geometry.vertices.push(el)
     })
 
-    const normals = getNormals()
+    const vectorNormals = getNormals()
 
     // geometry.faces.push( new THREE.Face3( 3, 0, 1 ) );
     // geometry.faces.push( new THREE.Face3( 3, 1, 2 ) );
@@ -74,12 +73,17 @@ function App() {
           mesh.indices[i], 
           mesh.indices[i+1], 
           mesh.indices[i+2], 
-          )
+          [
+            vectorNormals[mesh.indices[i]], 
+            vectorNormals[mesh.indices[i+1]], 
+            vectorNormals[mesh.indices[i+2]], 
+          ]
+        )
         geometry.faces.push( face );
       }
     })
 
-    geometry.computeVertexNormals();
+    // geometry.computeVertexNormals();
 
     geometry.computeBoundingSphere();
 
@@ -158,12 +162,12 @@ function App() {
   }
 
   const getPointsFromPositions = () => {
-    let points: number[][] = []
+    let points: THREE.Vector3[] = []
     
-    let point: number[] = []
+    let point: THREE.Vector3
     mesh.positions.forEach((el, i) => {
       if ((mesh.positions.length - i) % 3 === 0){
-        point = [ mesh.positions[i], mesh.positions[i+1], mesh.positions[i+2] ]
+        point = new THREE.Vector3(mesh.positions[i], mesh.positions[i+1], mesh.positions[i+2])
         points.push(point)
       } 
     })
@@ -174,12 +178,12 @@ function App() {
   }
 
   const getNormals = () => {
-    let points: number[][] = []
+    let points: THREE.Vector3[] = []
     
-    let point: number[] = []
+    let point: THREE.Vector3
     mesh.normals.forEach((el, i) => {
       if ((mesh.normals.length - i) % 3 === 0){
-        point = [ mesh.normals[i], mesh.normals[i+1], mesh.normals[i+2] ]
+        point = new THREE.Vector3(mesh.normals[i], mesh.normals[i+1], mesh.normals[i+2])
         points.push(point)
       } 
     })

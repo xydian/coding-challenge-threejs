@@ -1,3 +1,14 @@
+## Aufgabe
+- [ ] Erstelle eine Three.js Scene + Renderer und binde den Viewer in eine default React-App ein
+- [ ] Basierend auf der Mesh Repräsentation im Feile anbei, erzeuge eine Three.JS Geometrie und füge sie mit einem Standard-Material der Scene hinzu: 
+- [ ] Füge einen Button hinzu, der auf Knopfdruck die Farbe der Mesh-Geometrie verändert. 
+- [ ] (Bonus) - ermögliche es, per Click die Mesh-Geomentrie anzuwählen und die Farbe zu verändern. Also eine Art toggle-color-on-click. (Hints: raytracer)
+- [ ] Wenn du fertig bist, kannst du deine Lösung als Repository mit uns teilen. Idealerweise kann ich mit npm start/yarn start direkt selbst ausprobieren ob alles klappt :) 
+
+## Arbeitsschritte: 
+- Tutorial zu Three js (getting started guide) gemacht um mit den Begrifflichkeiten (Scene etc.) vertraut zu werden 
+
+# Create React App Readme
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

@@ -3,10 +3,7 @@ import './App.css';
 import * as THREE from "three";
 import * as mesh_representation from './test-mesh.json'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
-import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-
 import { Vector3 } from 'three';
 
 function App() {
@@ -22,6 +19,68 @@ function App() {
    */
   let color = '#173F5F'
 
+    /* ######################################################
+    Validating provided JSON file
+  ####################################################### */ 
+  useEffect(() => {
+    validateMeshJSON()
+  }, [])
+
+  const [ validateMeshJsonMsg, setValidateMeshJsonMsg ] = useState('')
+
+  const validateMeshJSON = () => {
+    const comps = []
+
+    if (!((meshRepresentation.positions.length % 3) === 0)){
+      setValidateMeshJsonMsg('Anzahl der Positions nicht restlos durch 3 teilbar')
+      return
+    } 
+
+    // if (!(meshRepresentation.indices.length === (meshRepresentation.positions.length / 3))){
+    //   setValidateMeshJsonMsg('Anzahl der Inidizes nicht korrekt')
+    //   return
+    // } 
+
+    if (!(meshRepresentation.normals.length === meshRepresentation.positions.length)){
+      setValidateMeshJsonMsg('Anzahl der Normalen nicht identisch mit der Anzahl der Positionen')
+      return
+    }
+  }
+
+  /**
+   * Returns Vector points based on positions in mesh_representations json
+   */
+  const getVectorPoints = () => {
+    const points: THREE.Vector3[] = []
+    
+    let point: THREE.Vector3
+    meshRepresentation.positions.forEach((el, i) => {
+      if ((meshRepresentation.positions.length - i) % 3 === 0){
+        point = new THREE.Vector3(meshRepresentation.positions[i], meshRepresentation.positions[i+1], meshRepresentation.positions[i+2])
+        points.push(point)
+      } 
+    })
+
+    return points
+  }
+
+  /**
+   * Returns Normals based on normals in mesh_representations json
+   */
+  const getNormals = () => {
+    const points: THREE.Vector3[] = []
+    
+    let point: THREE.Vector3
+    meshRepresentation.normals.forEach((el, i) => {
+      if ((meshRepresentation.normals.length - i) % 3 === 0){
+        point = new THREE.Vector3(meshRepresentation.normals[i], meshRepresentation.normals[i+1], meshRepresentation.normals[i+2])
+        points.push(point)
+      } 
+    })
+
+    return points
+  }
+  
   /* ######################################################
     Initializing ThreeJS Scene
   ####################################################### */ 
@@ -44,6 +103,7 @@ function App() {
   const initRenderer = (): THREE.WebGLRenderer => {
     var renderer = new THREE.WebGLRenderer()
     renderer.setSize( window.innerWidth/2, window.innerHeight/2 )
+    renderer.setPixelRatio( window.devicePixelRatio );
 
     return renderer
   }
@@ -80,42 +140,10 @@ function App() {
     scene.add( gridHelper )
   }
 
-  /**
-   * Returns Vector points based on positions in mesh_representations json
-   */
-  const getVectorPoints = () => {
-    const points: THREE.Vector3[] = []
-    
-    let point: THREE.Vector3
-    meshRepresentation.positions.forEach((el, i) => {
-      if ((meshRepresentation.positions.length - i) % 3 === 0){
-        point = new THREE.Vector3(meshRepresentation.positions[i], meshRepresentation.positions[i+1], meshRepresentation.positions[i+2])
-        points.push(point)
-      } 
-    })
-
-    return points
-  }
-
-  /**
-   * Returns Normals based on normals in mesh_representations json
-   */
-  const getNormals = () => {
-    const points: THREE.Vector3[] = []
-    
-    let point: THREE.Vector3
-    meshRepresentation.normals.forEach((el, i) => {
-      if ((meshRepresentation.normals.length - i) % 3 === 0){
-        point = new THREE.Vector3(meshRepresentation.normals[i], meshRepresentation.normals[i+1], meshRepresentation.normals[i+2])
-        points.push(point)
-      } 
-    })
-
-    return points
-  }
-
   const initThreeJSScene = () => {
     const scene = initScene()
+    addHelperGridToScene(scene)
+
     const camera = initCamera()
     const renderer = initRenderer()
     
@@ -152,21 +180,16 @@ function App() {
       }
     })
 
-    geometry.computeBoundingSphere();
-
     const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
     const mesh = new THREE.Mesh( geometry, material )
-
-    addHelperGridToScene(scene)
-
     scene.add( mesh )
 
     // uncomment to show vertex normals
     // var helper = new VertexNormalsHelper( cube, 2, 0xff0000 );
     // scene.add( helper );
 
-    let animate = () => {
-      requestAnimationFrame( animate );
+    let render = () => {
+      requestAnimationFrame( render );
       // uncomment to rotate geometrie animation
       // mesh.rotation.x += 0.01
       // mesh.rotation.y += 0.01
@@ -175,35 +198,7 @@ function App() {
       controls.update()
       renderer.render( scene, camera )
     }
-    animate()
-  }
-
-  /* ######################################################
-    Validating provided JSON file
-  ####################################################### */ 
-  useEffect(() => {
-    validateMeshJSON()
-  }, [])
-
-  const [ validateMeshJsonMsg, setValidateMeshJsonMsg ] = useState('')
-
-  const validateMeshJSON = () => {
-    const comps = []
-
-    if (!((meshRepresentation.positions.length % 3) === 0)){
-      setValidateMeshJsonMsg('Fehler beim Erstellen')
-      return
-    } 
-
-    // if (!(meshRepresentation.indices.length === (meshRepresentation.positions.length / 3))){
-    //   setValidateMeshJsonMsg('Anzahl der Inidizes nicht korrekt')
-    //   return
-    // } 
-
-    if (!(meshRepresentation.normals.length === meshRepresentation.positions.length)){
-      setValidateMeshJsonMsg('Anzahl der Normalen nicht identisch mit der Anzahl der Positionen')
-      return
-    }
+    render()
   }
 
   /**
@@ -215,6 +210,7 @@ function App() {
       color = colors[Math.floor((Math.random() * colors.length))]
     }
   }
+
   /**
    * Array with random colors to use to colorize geometry
    */

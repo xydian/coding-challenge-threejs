@@ -92,7 +92,7 @@ function App() {
     let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 )
     
     // hack to rotate view of camera
-    camera.position.addScalar(25) 
+    // camera.position.addScalar(25) 
     
     // move camera away from center
     camera.position.z = 20
@@ -184,6 +184,14 @@ function App() {
     const mesh = new THREE.Mesh( geometry, material )
     scene.add( mesh )
 
+    var raycaster = new THREE.Raycaster()
+    var mouse = new THREE.Vector2()
+    window.addEventListener( 'mousemove', (event) => {
+      event.preventDefault()
+      mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    }, false );
+
     // uncomment to show vertex normals
     // var helper = new VertexNormalsHelper( cube, 2, 0xff0000 );
     // scene.add( helper );
@@ -195,6 +203,18 @@ function App() {
       // mesh.rotation.y += 0.01
 
       mesh.material.color.set(color)
+
+      // update the picking ray with the camera and mouse position
+      raycaster.setFromCamera( mouse, camera );
+
+      // calculate objects intersecting the picking ray
+      var intersects = raycaster.intersectObjects( scene.children );
+
+      for ( var i = 0; i < intersects.length; i++ ) {
+        // @ts-ignore
+        intersects[ i ].object.material.color.set( 0xff0000 );
+      }
+
       controls.update()
       renderer.render( scene, camera )
     }

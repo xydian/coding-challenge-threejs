@@ -4,9 +4,9 @@
 test-mesh.json: Mesh data that should be used to render 
 
 ## Task
-- [ ] Create a Three.js scene + renderer and integrate the viewer in a default react app
-- [ ] Create a Three.js geometry based on the mesh representation in test-mesh.json and add it to the scene using a standard material
-- [ ] Add a button to change the color of the mesh geometry 
+- [x] Create a Three.js scene + renderer and integrate the viewer in a default react app
+- [x] Create a Three.js geometry based on the mesh representation in test-mesh.json and add it to the scene using a standard material
+- [x] Add a button to change the color of the mesh geometry 
 - [ ] (Bonus) Implement the feature to click on the mesh geometry to change its color (Hint: raytracer)
 
 ## Arbeitsschritte: 
